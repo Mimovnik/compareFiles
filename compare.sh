@@ -2,12 +2,13 @@
 fileToCompare=""
 firstFile=""
 secondFile=""
-result=""
+algorithm="sha256sum"
 
 while true; do
     menu=("1. Calculate control sum"
         "2. Compare two files"
-        "3. Quit"
+        "3. Choose comparing algorithm: $algorithm"
+        "4. Quit"
     )
 
     input=$(zenity --list --column=Menu "${menu[@]}" --width 400 --height 400)
@@ -16,7 +17,7 @@ while true; do
     "1. Calculate control sum")
         fileToCompare=$(zenity --file-selection --title "File to compare" --text "Choose a file to compare" --width 200)
 
-        fileSum=$(sha256sum "$fileToCompare")
+        fileSum=$($algorithm "$fileToCompare")
 
         resultInfo="Control sum:\n$fileSum"
         zenity --info --title "Result" --text "$resultInfo"
@@ -48,8 +49,8 @@ while true; do
                     zenity --warning --title "File missing" --text "Please choose both files to compare" --width 200
                     continue
                 fi
-                firstSum=$(sha256sum "$firstFile")
-                secondSum=$(sha256sum "$secondFile")
+                firstSum=$($algorithm "$firstFile")
+                secondSum=$($algorithm "$secondFile")
 
                 if [ "$firstSum" = "$secondSum" ]; then
 
@@ -69,6 +70,43 @@ while true; do
             esac
 
         done
+        ;;
+
+    "3. Choose comparing algorithm: $algorithm")
+        algrtmMenu=(
+            "1. sha256sum"
+            "2. sha1sum"
+            "3. sha224sum"
+            "4. sha384sum"
+            "5. sha512sum"
+            "6. md5sum"
+        )
+
+        algrtmInput=$(zenity --list --column=Menu "${algrtmMenu[@]}" --width 400 --height 400)
+        case $algrtmInput in
+
+        "1. sha256sum")
+            algorithm="sha256sum"
+            ;;
+        "2. sha1sum")
+            algorithm="sha1sum"
+            ;;
+        "3. sha224sum")
+            algorithm="sha224sum"
+            ;;
+        "4. sha384sum")
+            algorithm="sha384sum"
+            ;;
+        "5. sha512sum")
+            algorithm="sha512sum"
+            ;;
+        "6. md5sum")
+            algorithm="md5sum"
+            ;;
+        *) ;;
+
+        esac
+
         ;;
     *)
         break
