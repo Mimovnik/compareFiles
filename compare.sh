@@ -1,29 +1,31 @@
 #!/bin/bash
-fileToCompare=""
-firstFile=""
-secondFile=""
+fileToCompare="$1"
+firstFile="$1"
+secondFile="$2"
 algorithm="sha256sum"
 
 while true; do
-    menu=("1. Calculate control sum"
-        "2. Compare two files"
-        "3. Choose comparing algorithm: $algorithm"
-        "4. Quit"
-    )
+    option1="1. Calculate control sum of selected file"
+    option2="2. Compare two files"
+    option3="3. Calculate control sum of entered text"
+    option4="4. Choose comparing algorithm: $algorithm"
+    option5="5. Quit"
+
+    menu=("$option1" "$option2" "$option3" "$option4")
 
     input=$(zenity --list --column=Menu "${menu[@]}" --width 400 --height 400)
     case $input in
 
-    "1. Calculate control sum")
+    $option1)
         fileToCompare=$(zenity --file-selection --title "File to compare" --text "Choose a file to compare" --width 200)
 
-        fileSum=$($algorithm "$fileToCompare")
+        fileSum=$($algorithm "$fileToCompare" | cut -d " " -f 1)
 
         resultInfo="Control sum:\n$fileSum"
         zenity --info --title "Result" --text "$resultInfo"
         ;;
 
-    "2. Compare two files")
+    $option2)
 
         while true; do
             cmprMenu=(
@@ -49,8 +51,8 @@ while true; do
                     zenity --warning --title "File missing" --text "Please choose both files to compare" --width 200
                     continue
                 fi
-                firstSum=$($algorithm "$firstFile")
-                secondSum=$($algorithm "$secondFile")
+                firstSum=$($algorithm "$firstFile" | cut -d " " -f 1)
+                secondSum=$($algorithm "$secondFile" | cut -d " " -f 1)
 
                 if [ "$firstSum" = "$secondSum" ]; then
 
@@ -72,7 +74,19 @@ while true; do
         done
         ;;
 
-    "3. Choose comparing algorithm: $algorithm")
+    $option3)
+        text=$(zenity --entry --width 400 --height 300 --title "Calculate sum from text")
+        echo "$text" >tempSum.txt
+
+        textSum=$($algorithm tempSum.txt | cut -d " " -f 1)
+        resultInfo="Control sum of $text:\n$textSum"
+        zenity --info --title "Result" --text "$resultInfo"
+
+        #chmod +x tempSum.txt
+
+        ;;
+
+    $option4)
         algrtmMenu=(
             "1. sha256sum"
             "2. sha1sum"
