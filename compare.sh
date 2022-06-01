@@ -59,6 +59,8 @@ while true; do
                 else
                     resultInfo="Files are not the same\nFirst control sum:\n$firstSum\nSecond control sum:\n$secondSum"
 
+                    logEntry="$(date)   $algorithm   $firstFile: $firstSum   $secondFile: $secondSum"
+                    echo $logEntry>>log.txt
                 fi
 
                 zenity --info --title "Result" --text "$resultInfo"
@@ -121,6 +123,8 @@ while true; do
                 else
                     resultInfo="File and entered text are not the same\nFirst control sum:\n$firstSum\nSecond control sum:\n$textSum"
 
+                    logEntry="$(date)   $algorithm   $firstFile: $firstSum   $text: $textSum"
+                    echo $logEntry>>log.txt
                 fi
 
                 zenity --info --title "Result" --text "$resultInfo"
