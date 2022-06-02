@@ -7,7 +7,7 @@ while true; do
     option1="1. Calculate control sum of selected file"
     option2="2. Compare two files"
     option3="3. Calculate control sum of entered text"
-    option4="4. Compare file and text"
+    option4="4. Compare file and given checksum"
     option5="5. Choose comparing algorithm: $algorithm"
 
     menu=("$option1" "$option2" "$option3" "$option4" "$option5")
@@ -91,7 +91,7 @@ while true; do
 
             textFileMenu=(
                 "1. File: $firstFile"
-                "2. Text: $text"
+                "2. Checksum: $textSum"
                 "3. Compare"
                 "4. Main menu"
             )
@@ -103,19 +103,17 @@ while true; do
                 firstFile=$(zenity --file-selection --title "File to compare" --text "Choose a file to compare" --width 200)
                 ;;
 
-            "2. Text: $text")
-                text=$(zenity --entry --width 400 --height 300 --title "Calculate sum from text")
-                echo "$text" >tempSum.txt
+            "2. Checksum: $textSum")
+                textSum=$(zenity --entry --width 400 --height 300 --title "Enter a checksum")
 
                 ;;
 
             "3. Compare")
-                if [[ -z $firstFile ]] || [[ -z $text ]]; then
-                    zenity --warning --title "File or text missing" --text "Please choose file and enter text to compare" --width 200
+                if [[ -z $firstFile ]] || [[ -z $textSum ]]; then
+                    zenity --warning --title "File or checksum missing" --text "Please choose file and enter checksum to compare" --width 200
                     continue
                 fi
                 firstSum=$($algorithm "$firstFile" | cut -d " " -f 1)
-                textSum=$($algorithm tempSum.txt | cut -d " " -f 1)
 
                 if [ "$firstSum" = "$textSum" ]; then
 
@@ -123,12 +121,11 @@ while true; do
                 else
                     resultInfo="File and entered text are not the same\nFirst control sum:\n$firstSum\nSecond control sum:\n$textSum"
 
-                    logEntry="$(date)   $algorithm   $firstFile: $firstSum   $text: $textSum"
+                    logEntry="$(date)   $algorithm   $firstFile: $firstSum   Checksum: $textSum"
                     echo $logEntry>>log.txt
                 fi
 
                 zenity --info --title "Result" --text "$resultInfo"
-                rm tempSum.txt
                 ;;
 
             *)
